@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบริหารจัดการหลักสูตรและอาจารย์ผู้รับผิดชอบหลักสูตร (Supabase Cloud)</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Supabase JS Client v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+/* Reset & Base */
+*, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e2e8f0; }
+html { line-height: 1.5; -webkit-text-size-adjust: 100%; tab-size: 4; font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+body { margin: 0; line-height: inherit; font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #1e293b; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+table { text-indent: 0; border-color: inherit; border-collapse: collapse; width: 100%; }
+button, input, select, textarea { font-family: inherit; font-size: 100%; line-height: inherit; color: inherit; margin: 0; padding: 0; }
+button, select { text-transform: none; }
+button, [type='button'], [type='reset'], [type='submit'] { -webkit-appearance: button; background-color: transparent; background-image: none; cursor: pointer; }
+h1, h2, h3, p, ul, pre { margin: 0; }
+ul { list-style: none; padding: 0; }
+
+/* Display & Layout */
+.block { display: block; }
+.inline-block { display: inline-block; }
+.inline-flex { display: inline-flex; }
+.flex { display: flex; }
+.grid { display: grid; }
+.hidden { display: none !important; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.flex-1 { flex: 1 1 0%; }
+
+/* Grid columns & gap */
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+/* Spacing */
+.space-x-1 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.25rem; }
+.space-x-1\.5 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.375rem; }
+.space-x-2 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.5rem; }
+.space-x-3 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.75rem; }
+.space-x-4 > :not([hidden]) ~ :not([hidden]) { margin-left: 1rem; }
+.space-x-6 > :not([hidden]) ~ :not([hidden]) { margin-left: 1.5rem; }
+.space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem; }
+.space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+.space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
+.space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+.space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+
+/* Positioning & Sizes */
+.relative { position: relative; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+.top-0 { top: 0px; }
+.inset-0 { top: 0px; right: 0px; bottom: 0px; left: 0px; }
+.inset-y-0 { top: 0px; bottom: 0px; }
+.left-0 { left: 0px; }
+.right-0 { right: 0px; }
+.z-30 { z-index: 30; }
+.z-50 { z-index: 50; }
+.w-full { width: 100%; }
+.max-w-7xl { max-width: 80rem; }
+.max-w-3xl { max-width: 48rem; }
+.max-w-2xl { max-width: 42rem; }
+.max-w-md { max-width: 28rem; }
+.h-16 { height: 4rem; }
+.w-4 { width: 1rem; }
+.h-4 { height: 1rem; }
+.w-5 { width: 1.25rem; }
+.h-5 { height: 1.25rem; }
+.w-6 { width: 1.5rem; }
+.h-6 { height: 1.5rem; }
+.w-10 { width: 2.5rem; }
+.h-10 { height: 2.5rem; }
+.w-12 { width: 3rem; }
+.h-12 { height: 3rem; }
+.w-28 { width: 7rem; }
+.w-36 { width: 9rem; }
+.w-48 { width: 12rem; }
+.w-72 { width: 18rem; }
+
+/* Padding & Margin */
+.p-2 { padding: 0.5rem; }
+.p-2\.5 { padding: 0.625rem; }
+.p-3 { padding: 0.75rem; }
+.p-3\.5 { padding: 0.875rem; }
+.p-4 { padding: 1rem; }
+.p-5 { padding: 1.25rem; }
+.p-6 { padding: 1.5rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.px-3\.5 { padding-left: 0.875rem; padding-right: 0.875rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+.py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
+.py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+.py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+.pl-3 { padding-left: 0.75rem; }
+.pl-4 { padding-left: 1rem; }
+.pl-7 { padding-left: 1.75rem; }
+.pl-9 { padding-left: 2.25rem; }
+.pr-2 { padding-right: 0.5rem; }
+.pr-3 { padding-right: 0.75rem; }
+.pr-4 { padding-right: 1rem; }
+.pb-1 { padding-bottom: 0.25rem; }
+.pb-2 { padding-bottom: 0.5rem; }
+.pt-1 { padding-top: 0.25rem; }
+.pt-2 { padding-top: 0.5rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.mx-6 { margin-left: 1.5rem; margin-right: 1.5rem; }
+.mt-0\.5 { margin-top: 0.125rem; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mr-1 { margin-right: 0.25rem; }
+.mr-1\.5 { margin-right: 0.375rem; }
+.ml-1 { margin-left: 0.25rem; }
+
+/* Colors */
+.bg-white { background-color: #ffffff; }
+.bg-slate-50 { background-color: #f8fafc; }
+.bg-slate-50\/50 { background-color: rgba(248, 250, 252, 0.5); }
+.bg-slate-50\/70 { background-color: rgba(248, 250, 252, 0.7); }
+.bg-slate-50\/80 { background-color: rgba(248, 250, 252, 0.8); }
+.bg-slate-100 { background-color: #f1f5f9; }
+.bg-slate-200 { background-color: #e2e8f0; }
+.bg-slate-900 { background-color: #0f172a; }
+.bg-slate-900\/60 { background-color: rgba(15, 23, 42, 0.6); }
+.bg-blue-50 { background-color: #eff6ff; }
+.bg-blue-100 { background-color: #dbeafe; }
+.bg-blue-600 { background-color: #2563eb; }
+.bg-emerald-50 { background-color: #ecfdf5; }
+.bg-emerald-100 { background-color: #d1fae5; }
+.bg-emerald-200 { background-color: #a7f3d0; }
+.bg-emerald-600 { background-color: #059669; }
+.bg-amber-50 { background-color: #fffbeb; }
+.bg-amber-100 { background-color: #fef3c7; }
+.bg-amber-200 { background-color: #fde68a; }
+.bg-amber-500 { background-color: #f59e0b; }
+.bg-rose-50 { background-color: #fff1f2; }
+.bg-rose-100 { background-color: #ffe4e6; }
+.bg-rose-600 { background-color: #e11d48; }
+.bg-indigo-50 { background-color: #eef2ff; }
+.bg-indigo-100 { background-color: #e0e7ff; }
+.bg-indigo-600 { background-color: #4f46e5; }
+.bg-indigo-700 { background-color: #4338ca; }
+.bg-purple-50 { background-color: #faf5ff; }
+
+.text-white { color: #ffffff; }
+.text-slate-400 { color: #94a3b8; }
+.text-slate-500 { color: #64748b; }
+.text-slate-600 { color: #475569; }
+.text-slate-700 { color: #334155; }
+.text-slate-800 { color: #1e293b; }
+.text-slate-900 { color: #0f172a; }
+.text-indigo-600 { color: #4f46e5; }
+.text-indigo-700 { color: #4338ca; }
+.text-indigo-800 { color: #3730a3; }
+.text-blue-600 { color: #2563eb; }
+.text-blue-700 { color: #1d4ed8; }
+.text-blue-800 { color: #1e40af; }
+.text-emerald-600 { color: #059669; }
+.text-emerald-700 { color: #047857; }
+.text-emerald-800 { color: #065f46; }
+.text-amber-700 { color: #b45309; }
+.text-amber-800 { color: #92400e; }
+.text-rose-600 { color: #e11d48; }
+.text-rose-700 { color: #be123c; }
+.text-rose-800 { color: #9f1239; }
+.text-purple-700 { color: #7e22ce; }
+
+.border { border-width: 1px; }
+.border-2 { border-width: 2px; }
+.border-b { border-bottom-width: 1px; }
+.border-b-2 { border-bottom-width: 2px; }
+.border-t { border-top-width: 1px; }
+.border-dashed { border-style: dashed; }
+.border-transparent { border-color: transparent; }
+.border-slate-100 { border-color: #f1f5f9; }
+.border-slate-200 { border-color: #e2e8f0; }
+.border-slate-300 { border-color: #cbd5e1; }
+.border-indigo-200 { border-color: #c7d2fe; }
+.border-indigo-600 { border-color: #4f46e5; }
+.border-emerald-200 { border-color: #a7f3d0; }
+.border-emerald-300 { border-color: #6ee7b7; }
+.border-amber-200 { border-color: #fde68a; }
+.border-rose-200 { border-color: #fecdd3; }
+.border-rose-300 { border-color: #fda4af; }
+.border-rose-400 { border-color: #fb7185; }
+
+.rounded { border-radius: 0.25rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+.rounded-2xl { border-radius: 1rem; }
+.rounded-full { border-radius: 9999px; }
+
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+.tracking-wide { letter-spacing: 0.025em; }
+.uppercase { text-transform: uppercase; }
+.italic { font-style: italic; }
+
+.overflow-hidden { overflow: hidden; }
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
+.max-h-\[92vh\] { max-height: 92vh; }
+.pointer-events-none { pointer-events: none; }
+.transition { transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+
+.hover\:bg-slate-50:hover { background-color: #f8fafc; }
+.hover\:bg-slate-100:hover { background-color: #f1f5f9; }
+.hover\:bg-indigo-50:hover { background-color: #eef2ff; }
+.hover\:bg-indigo-100:hover { background-color: #e0e7ff; }
+.hover\:bg-indigo-700:hover { background-color: #4338ca; }
+.hover\:bg-rose-50:hover { background-color: #fff1f2; }
+.hover\:bg-rose-700:hover { background-color: #be123c; }
+.hover\:text-slate-600:hover { color: #475569; }
+.hover\:text-slate-700:hover { color: #334155; }
+.hover\:text-rose-600:hover { color: #e11d48; }
+
+@media (min-width: 640px) {
+  .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+}
+@media (min-width: 768px) {
+  .md\:grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .md\:col-span-5 { grid-column: span 5 / span 5; }
+  .md\:col-span-4 { grid-column: span 4 / span 4; }
+  .md\:col-span-3 { grid-column: span 3 / span 3; }
+  .md\:flex-row { flex-direction: row; }
+  .md\:items-center { align-items: center; }
+}
+@media (min-width: 1024px) {
+  .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+}
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-700 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-emerald-200 font-bold text-lg">
+            ⚡
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h1 class="text-base font-bold text-slate-900 leading-tight">ระบบบริหารจัดการหลักสูตรและอาจารย์ผู้รับผิดชอบหลักสูตร</h1>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Supabase Cloud</span>
+            </div>
+            <p class="text-xs text-slate-500">มหาวิทยาลัยเทคโนโลยีราชมงคลพระนคร</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <div id="auth-status-container" class="flex items-center space-x-1.5">
+            <!-- Dynamic Auth Status -->
+          </div>
+          <button onclick="fetchCoursesAndChairs()" class="inline-flex items-center px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 hover:bg-slate-100 shadow-sm transition">
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            รีเฟรชข้อมูล
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="flex space-x-6 border-t border-slate-100 text-sm font-medium">
+        <button id="nav-courses-btn" onclick="switchMainTab('courses')" class="py-2.5 border-b-2 border-indigo-600 text-indigo-600 font-bold flex items-center space-x-1.5">
+          <span>1. รายการหลักสูตร</span>
+        </button>
+        <button id="nav-report-btn" onclick="switchMainTab('report')" class="py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-1.5">
+          <span>2. อาจารย์ผู้รับผิดชอบหลักสูตร (Report View)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- VIEW 1: COURSES MANAGEMENT -->
+    <div id="view-courses" class="space-y-6">
+      
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">หลักสูตรทั้งหมด</p>
+            <p id="stat-total" class="text-3xl font-bold text-slate-900 mt-1">0</p>
+            <p class="text-xs text-slate-400 mt-0.5">ในฐานข้อมูล Supabase Cloud</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shadow-sm">
+            📚
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-indigo-700 uppercase tracking-wide">จำนวนอาจารย์ผู้รับผิดชอบหลักสูตร</p>
+            <p id="stat-total-chairs" class="text-3xl font-bold text-indigo-600 mt-1">0</p>
+            <p id="stat-unique-chairs" class="text-xs text-indigo-500 mt-0.5">0 ท่าน (ไม่ซ้ำ)</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold shadow-sm">
+            👥
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters & Actions Toolbar -->
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+          <div class="md:col-span-5 relative">
+            <input id="search-input" oninput="renderCoursesTable()" type="text" placeholder="ค้นหา รหัส, สาขาวิชา, คณะ/วิทยาลัย, ชื่ออาจารย์, กลุ่ม ISCED..." class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+          </div>
+
+          <div class="md:col-span-4">
+            <select id="faculty-filter" onchange="renderCoursesTable()" class="w-full py-2 px-3 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+              <option value="all">ทุกคณะ / วิทยาลัย (ทั้งหมด)</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-3">
+            <select id="level-filter" onchange="renderCoursesTable()" class="w-full py-2 px-3 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+              <option value="all">ทุกระดับการศึกษา (ทั้งหมด)</option>
+              <option value="ปริญญาตรี">ปริญญาตรี</option>
+              <option value="ปริญญาโท">ปริญญาโท</option>
+              <option value="ปริญญาเอก">ปริญญาเอก</option>
+              <option value="ประกาศนียบัตรบัณฑิต">ประกาศนียบัตรบัณฑิต</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-slate-500">
+          <div id="filter-count" class="text-slate-600 font-semibold">
+            กำลังโหลดข้อมูลหลักสูตร...
+          </div>
+          <div>
+            <button onclick="handleAddNewCourseClick()" class="inline-flex items-center px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition">
+              + เพิ่มหลักสูตรใหม่
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Courses Table -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+            <thead class="bg-slate-50 text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              <tr>
+                <th class="py-3.5 pl-4 pr-2 text-center w-12">ที่</th>
+                <th class="px-3 py-3.5 w-48">คณะ / วิทยาลัย</th>
+                <th class="px-3 py-3.5 w-28 text-center">ระดับ</th>
+                <th class="px-3 py-3.5 w-72">สาขาวิชา / หลักสูตร</th>
+                <th class="px-3 py-3.5">อาจารย์ผู้รับผิดชอบหลักสูตร</th>
+                <th class="px-3 py-3.5 text-center w-36 pr-4">การจัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="courses-table-body" class="divide-y divide-slate-200 bg-white">
+              <!-- Render rows dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div id="courses-empty-state" class="hidden py-12 text-center">
+          <p class="text-sm text-slate-500 font-medium">ไม่พบหลักสูตรที่ตรงกับเงื่อนไขการค้นหา</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: REPORT VIEW -->
+    <div id="view-report" class="hidden space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">อาจารย์ผู้รับผิดชอบหลักสูตร (Report View)</h2>
+          <p class="text-xs text-slate-500">รายงานข้อมูลหลักสูตร 10 คอลัมน์ พร้อมรายชื่ออาจารย์ผู้รับผิดชอบหลักสูตรรายคน</p>
+        </div>
+        <button onclick="window.print()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold shadow-sm transition">
+          พิมพ์หน้านี้ / PDF
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-300 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full border-collapse text-left text-xs">
+            <thead class="bg-slate-100 text-slate-800 font-bold border-b-2 border-slate-300">
+              <tr>
+                <th class="border border-slate-300 px-3 py-2 w-32">รหัสหลักสูตร</th>
+                <th class="border border-slate-300 px-3 py-2">คณะ/วิทยาลัย</th>
+                <th class="border border-slate-300 px-3 py-2 w-24">ระดับ</th>
+                <th class="border border-slate-300 px-3 py-2">ชื่อหลักสูตร</th>
+                <th class="border border-slate-300 px-3 py-2">สาขาวิชา</th>
+                <th class="border border-slate-300 px-3 py-2 w-28">ปี</th>
+                <th class="border border-slate-300 px-3 py-2 w-24">มาตรฐาน IQA</th>
+                <th class="border border-slate-300 px-3 py-2 w-24">เกณฑ์มาตรฐาน</th>
+                <th class="border border-slate-300 px-3 py-2 w-32">กลุ่ม ISCED</th>
+                <th class="border border-slate-300 px-3 py-2 min-w-[260px]">อาจารย์ผู้รับผิดชอบหลักสูตร</th>
+              </tr>
+            </thead>
+            <tbody id="report-table-body" class="bg-white divide-y divide-slate-200">
+              <!-- Render rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== PASSWORD AUTH MODAL ==================== -->
+  <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="text-lg">🔒</span>
+          <h2 class="text-sm font-bold text-slate-900">ยืนยันสิทธิ์เพื่อจัดการข้อมูล</h2>
+        </div>
+        <button onclick="closePasswordModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+      <form onsubmit="submitPasswordAuth(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">รหัสผ่าน (Password):</label>
+          <input id="auth-password-input" type="password" placeholder="กรอกรหัสผ่าน..." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+          <p id="auth-error-msg" class="hidden text-xs text-rose-600 font-medium mt-1.5">รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</p>
+        </div>
+        <div class="flex items-center justify-end space-x-2 pt-2">
+          <button type="button" onclick="closePasswordModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100">ยกเลิก</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm">เข้าสู่ระบบ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== COURSE EDIT / ADD MODAL (CRUD) ==================== -->
+  <div id="course-form-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div>
+          <h2 id="course-form-title" class="text-base font-bold text-slate-900">เพิ่มหลักสูตรใหม่</h2>
+          <p class="text-xs text-slate-500">กรอกข้อมูลรายละเอียดหลักสูตรเพื่อบันทึกลง Supabase</p>
+        </div>
+        <button onclick="closeCourseFormModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+      <form onsubmit="saveCourseForm(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="form-course-id">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">รหัสหลักสูตร *</label>
+            <input type="text" id="form-course-code" required placeholder="เช่น 25501941102857" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 font-mono text-sm">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ระดับการศึกษา *</label>
+            <select id="form-course-level" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 font-medium">
+              <option value="ปริญญาตรี">ปริญญาตรี</option>
+              <option value="ปริญญาโท">ปริญญาโท</option>
+              <option value="ปริญญาเอก">ปริญญาเอก</option>
+              <option value="ประกาศนียบัตรบัณฑิต">ประกาศนียบัตรบัณฑิต</option>
+            </select>
+          </div>
+          <div class="sm:grid-cols-2">
+            <label class="block font-semibold text-slate-700 mb-1">คณะ / วิทยาลัย *</label>
+            <input type="text" id="form-course-faculty" required placeholder="เช่น คณะเทคโนโลยีคหกรรมศาสตร์" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ชื่อปริญญา (ชื่อหลักสูตร) *</label>
+            <input type="text" id="form-course-degree" required placeholder="เช่น คหกรรมศาสตรบัณฑิต" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">สาขาวิชา *</label>
+            <input type="text" id="form-course-major" required placeholder="เช่น ออกแบบแฟชั่นและการจัดการสินค้า" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ปี (เช่น หลักสูตรปรับปรุง พ.ศ. 2565) *</label>
+            <input type="text" id="form-course-year" required placeholder="หลักสูตรปรับปรุง พ.ศ. 2565" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">มาตรฐาน IQA</label>
+            <input type="text" id="form-course-iqa" placeholder="เช่น สป.อว. / AUNQA / ABET" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">เกณฑ์มาตรฐานหลักสูตร</label>
+            <input type="text" id="form-course-standard" placeholder="เช่น พ.ศ. 2558 หรือ พ.ศ. 2565" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-slate-700 mb-1">กลุ่ม ISCED</label>
+            <input type="text" id="form-course-isced" placeholder="เช่น มนุษยศาสตร์และสังคมศาสตร์ หรือ วิทยาศาสตร์เทคโนโลยี" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeCourseFormModal()" class="px-4 py-2 border border-slate-300 rounded-xl font-semibold text-slate-700 hover:bg-slate-100">ยกเลิก</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-sm">บันทึกข้อมูลหลักสูตร</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== EDIT INSTRUCTORS MODAL ==================== -->
+  <div id="edit-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[92vh] flex flex-col border border-slate-200 overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-start justify-between">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span id="modal-badge-level" class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-100 text-indigo-700">ป.ตรี</span>
+            <span id="modal-course-code" class="text-xs font-mono bg-slate-200 text-slate-700 px-2 py-0.5 rounded">25501941102857</span>
+            <span id="modal-faculty" class="text-xs text-slate-500">คณะ</span>
+          </div>
+          <h2 id="modal-major" class="text-lg font-bold text-slate-900 mt-1">ชื่อสาขาวิชา</h2>
+          <p id="modal-degree" class="text-xs text-slate-600">หลักสูตร</p>
+        </div>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      </div>
+
+      <!-- Criteria Banner -->
+      <div id="modal-criteria-box" class="mx-6 mt-4 p-3.5 rounded-xl border flex items-center justify-between text-xs">
+        <div>
+          <div class="font-bold text-slate-800 flex items-center space-x-1">
+            <span>เกณฑ์มาตรฐาน อว.:</span>
+            <span id="modal-criteria-text" class="text-slate-600 font-normal">ต้องมีอาจารย์ผู้รับผิดชอบหลักสูตรอย่างน้อย 5 คน</span>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-0.5">
+            *ห้ามซ้ำซ้อนในระดับ ป.ตรี / ป.บัณฑิต / ป.โท / ป.เอก (ยกเว้น ป.โท-ป.เอก ในสาขาวิชาเดียวกันที่อนุญาตให้ใช้ชุดเดียวกันได้)
+          </div>
+        </div>
+        <div>
+          <span id="modal-chair-count-badge" class="px-2.5 py-1 rounded-full font-bold text-xs bg-amber-200 text-amber-900">0/5 คน</span>
+        </div>
+      </div>
+
+      <!-- Mode Selector -->
+      <div class="px-6 pt-3 flex space-x-3 border-b border-slate-200 text-xs font-semibold">
+        <button id="tab-list-btn" onclick="setEditMode('list')" class="pb-2 px-1 border-b-2 border-indigo-600 text-indigo-600">
+          กรอกรายคน
+        </button>
+        <button id="tab-bulk-btn" onclick="setEditMode('bulk')" class="pb-2 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-700">
+          วางหลายบรรทัดพร้อมกัน (Bulk Paste)
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="px-6 py-4 overflow-y-auto flex-1 space-y-3">
+        <div id="mode-list" class="space-y-3">
+          <div class="flex items-center space-x-1 text-xs pb-1">
+            <span class="text-slate-400 text-[11px]">เติมคำนำหน้า:</span>
+            <button type="button" onmousedown="event.preventDefault()" onclick="addTitleToActive('ศ.ดร.')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-100 text-slate-700 font-medium">ศ.ดร.</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="addTitleToActive('รศ.ดร.')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-100 text-slate-700 font-medium">รศ.ดร.</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="addTitleToActive('ผศ.ดร.')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-100 text-slate-700 font-medium">ผศ.ดร.</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="addTitleToActive('ผศ.')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-100 text-slate-700 font-medium">ผศ.</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="addTitleToActive('อ.ดร.')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-100 text-slate-700 font-medium">อ.ดร.</button>
+            <button type="button" onmousedown="event.preventDefault()" onclick="addTitleToActive('อาจารย์ ')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-100 text-slate-700 font-medium">อาจารย์</button>
+          </div>
+
+          <div id="chair-inputs-container" class="space-y-2.5">
+            <!-- Dynamically injected -->
+          </div>
+
+          <button onclick="addChairInput('', '', '', '')" class="w-full py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-xs font-bold text-slate-600 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50/40 transition">
+            + เพิ่มอาจารย์ผู้รับผิดชอบหลักสูตร
+          </button>
+        </div>
+
+        <div id="mode-bulk" class="hidden space-y-2">
+          <p class="text-xs text-slate-500">คัดลอกรายชื่ออาจารย์มาวางที่นี่ โดยแยก 1 คนต่อ 1 บรรทัด:</p>
+          <textarea id="bulk-textarea" rows="8" placeholder="ผศ.ดร.สมชาย ใจดี&#10;รศ.ดร.กานดา สุวรรณ" class="w-full p-3 text-sm border border-slate-200 rounded-xl font-mono"></textarea>
+          <button onclick="applyBulkPaste()" class="px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 rounded-lg text-xs font-bold">
+            แปลงเป็นตารางรายคน &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end space-x-2">
+        <button onclick="closeEditModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100">ยกเลิก</button>
+        <button onclick="saveModalData()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm">
+          บันทึกลง Supabase
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" style="display:none;" class="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-xl font-medium text-sm text-white bg-slate-900"></div>
+
+  <script>
+    // ==================== SUPABASE CONFIGURATION ====================
+    const SUPABASE_URL = 'https://fpbzjauwvpisvezxixte.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_ICCSXSMCVJSEplkbBdEIXA_VDAfVgaM';
+    let supabaseClient = null;
+
+    function initSupabase() {
+      try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } catch (e) {
+        console.error('Supabase init error:', e);
+      }
+    }
+
+    // ==================== AUTHENTICATION (PASSWORD: rmutp2569) ====================
+    const SYSTEM_PASSWORD = 'rmutp2569';
+    let pendingAction = null;
+
+    function isAuthenticated() {
+      try {
+        return sessionStorage.getItem('rmutp_user_auth') === SYSTEM_PASSWORD;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function openPasswordModal(actionCallback = null) {
+      pendingAction = actionCallback;
+      const modal = document.getElementById('auth-modal');
+      const input = document.getElementById('auth-password-input');
+      const errorMsg = document.getElementById('auth-error-msg');
+      if (errorMsg) errorMsg.classList.add('hidden');
+      if (input) {
+        input.value = '';
+        input.classList.remove('border-rose-400');
+      }
+      if (modal) modal.classList.remove('hidden');
+      setTimeout(() => { if (input) input.focus(); }, 100);
+    }
+
+    function closePasswordModal() {
+      const modal = document.getElementById('auth-modal');
+      if (modal) modal.classList.add('hidden');
+      pendingAction = null;
+    }
+
+    function submitPasswordAuth(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('auth-password-input');
+      const errorMsg = document.getElementById('auth-error-msg');
+      const val = input ? input.value.trim() : '';
+
+      if (val === SYSTEM_PASSWORD) {
+        try {
+          sessionStorage.setItem('rmutp_user_auth', SYSTEM_PASSWORD);
+        } catch (err) {}
+        closePasswordModal();
+        renderAuthStatus();
+        showToast('🔓 ปลดล็อกสิทธิ์สำเร็จ คุณสามารถเพิ่ม/ลด/แก้ไขข้อมูลได้', 'success');
+        if (typeof pendingAction === 'function') {
+          const act = pendingAction;
+          pendingAction = null;
+          act();
+        }
+      } else {
+        if (errorMsg) errorMsg.classList.remove('hidden');
+        if (input) {
+          input.classList.add('border-rose-400');
+          input.focus();
+        }
+      }
+    }
+
+    function logoutAuth() {
+      try {
+        sessionStorage.removeItem('rmutp_user_auth');
+      } catch (e) {}
+      renderAuthStatus();
+      showToast('🔒 ออกจากระบบเรียบร้อย กลับสู่โหมดดูข้อมูล', 'info');
+    }
+
+    function renderAuthStatus() {
+      const container = document.getElementById('auth-status-container');
+      if (!container) return;
+      if (isAuthenticated()) {
+        container.innerHTML = `
+          <div class="flex items-center space-x-1">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
+              ✓ สิทธิ์ผู้ดูแลระบบ
+            </span>
+            <button onclick="logoutAuth()" class="text-xs text-slate-500 hover:text-rose-600 font-medium px-1.5 py-1 rounded hover:bg-slate-100 transition">
+              ล็อกเอาต์
+            </button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <button onclick="openPasswordModal()" class="inline-flex items-center px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-sm transition">
+            🔒 เข้าสู่ระบบบันทึก
+          </button>
+        `;
+      }
+    }
+
+    // ==================== DATA STATE ====================
+    let courses = [];
+    let currentEditingCode = null;
+    let activeInputIndex = 0;
+    let lastFocusedChairInput = null;
+
+    function showToast(msg, type = 'info') {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-xl font-medium text-sm transition text-white ' +
+        (type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-indigo-600');
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      clearTimeout(window.__toastTimeout);
+      window.__toastTimeout = setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    }
+
+    // ==================== SUPABASE FETCH & SYNC ====================
+    async function fetchCoursesAndChairs() {
+      if (!supabaseClient) return;
+
+      showToast('กำลังซิงค์ข้อมูลจาก Supabase Cloud...', 'info');
+      try {
+        const { data: coursesData, error: cErr } = await supabaseClient
+          .from('courses')
+          .select('*')
+          .order('order_no', { ascending: true });
+
+        if (cErr) throw cErr;
+
+        const { data: chairsData, error: chErr } = await supabaseClient
+          .from('course_chairs')
+          .select('*')
+          .order('order_no', { ascending: true });
+
+        if (chErr) throw chErr;
+
+        const chairsMap = {};
+        if (chairsData) {
+          chairsData.forEach(ch => {
+            const code = String(ch.course_code || '').trim();
+            if (!chairsMap[code]) chairsMap[code] = [];
+            chairsMap[code].push({
+              id: ch.id,
+              name: ch.name,
+              academicTitle: ch.academic_title,
+              degree: ch.degree_level,
+              role: ch.role || 'อาจารย์ผู้รับผิดชอบหลักสูตร'
+            });
+          });
+        }
+
+        courses = (coursesData || []).map((c, idx) => ({
+          id: c.id,
+          order_no: c.order_no || (idx + 1),
+          code: c.code,
+          faculty: c.faculty,
+          level: c.level,
+          degree: c.degree,
+          major: c.major,
+          year: c.year,
+          minReq: c.min_req || (c.level.includes('โท') || c.level.includes('เอก') ? 3 : 5),
+          iqa_standard: c.iqa_standard,
+          course_standard: c.course_standard,
+          isced_group: c.isced_group,
+          chairs: chairsMap[String(c.code).trim()] || []
+        }));
+
+        populateFacultyDropdown();
+        renderCoursesTable();
+        renderReportTable();
+        showToast(`✅ โหลดข้อมูล ${courses.length} หลักสูตรสำเร็จแล้ว`, 'success');
+      } catch (err) {
+        console.error('fetch error:', err);
+        showToast('⚠️ เชื่อมต่อ Supabase ขัดข้อง: ' + err.message, 'error');
+      }
+    }
+
+    // ==================== ACCREDITATION & MHESI LOGIC ====================
+    function cleanTeacherKey(name) {
+      if (!name) return '';
+      return String(name).replace(/\s+/g, '').trim().toLowerCase();
+    }
+
+    function normalizeMajorText(val) {
+      if (val === null || val === undefined) return '';
+      return String(val).replace(/\s+/g, '').trim().toLowerCase();
+    }
+
+    function isMasterDegree(level) {
+      return String(level || '').indexOf('โท') > -1;
+    }
+
+    function isDoctorateDegree(level) {
+      return String(level || '').indexOf('เอก') > -1;
+    }
+
+    function isMasterDoctoratePair(lvl1, lvl2) {
+      return (isMasterDegree(lvl1) && isDoctorateDegree(lvl2)) || 
+             (isDoctorateDegree(lvl1) && isMasterDegree(lvl2));
+    }
+
+    function isAllowedMhesiException(courseA, courseB) {
+      if (!courseA || !courseB) return false;
+      const isPair = isMasterDoctoratePair(courseA.level, courseB.level);
+      const isSameMajor = normalizeMajorText(courseA.major) === normalizeMajorText(courseB.major);
+      return isPair && isSameMajor;
+    }
+
+    // ==================== RENDER TABLES ====================
+    function renderCoursesTable() {
+      const searchInput = document.getElementById('search-input');
+      const facSelect = document.getElementById('faculty-filter');
+      const lvlSelect = document.getElementById('level-filter');
+
+      const search = (searchInput ? searchInput.value : '').toLowerCase().trim();
+      const facFilter = facSelect ? facSelect.value : 'all';
+      const lvlFilter = lvlSelect ? lvlSelect.value : 'all';
+
+      let totalChairSlots = 0;
+      courses.forEach(c => {
+        totalChairSlots += (c.chairs && Array.isArray(c.chairs) ? c.chairs.length : 0);
+      });
+
+      if (document.getElementById('stat-total')) document.getElementById('stat-total').textContent = courses.length;
+      if (document.getElementById('stat-total-chairs')) document.getElementById('stat-total-chairs').textContent = totalChairSlots;
+
+      const allNames = new Set();
+      let totalViolations = 0;
+
+      courses.forEach(c => {
+        if (c.chairs && Array.isArray(c.chairs)) {
+          c.chairs.forEach(ch => {
+            const tName = String(ch.name || '').trim();
+            if (!tName) return;
+            allNames.add(tName);
+
+            let hasV = false;
+            const cleanKey = cleanTeacherKey(tName);
+
+            if (c.chairs.filter(x => cleanTeacherKey(x.name) === cleanKey).length > 1) {
+              hasV = true;
+            }
+
+            courses.forEach(otherC => {
+              if (String(otherC.code) !== String(c.code) && otherC.chairs && Array.isArray(otherC.chairs)) {
+                if (otherC.chairs.some(och => cleanTeacherKey(och.name) === cleanKey)) {
+                  if (!isAllowedMhesiException(c, otherC)) {
+                    hasV = true;
+                  }
+                }
+              }
+            });
+
+            if (hasV) totalViolations++;
+          });
+        }
+      });
+
+      if (document.getElementById('stat-unique-chairs')) {
+        if (totalChairSlots === 0) {
+          document.getElementById('stat-unique-chairs').textContent = '0 ท่าน (ยังไม่มีข้อมูล)';
+        } else if (totalViolations > 0) {
+          document.getElementById('stat-unique-chairs').innerHTML = `อาจารย์รายบุคคล: ${allNames.size} ท่าน <span class="text-rose-600 font-bold">(⚠️ พบชื่อซ้ำผิดเกณฑ์ ${totalViolations} ตำแหน่ง)</span>`;
+        } else {
+          document.getElementById('stat-unique-chairs').innerHTML = `อาจารย์รายบุคคล: ${allNames.size} ท่าน <span class="text-emerald-700 font-semibold">(ไม่พบชื่อซ้ำซ้อนผิดเกณฑ์)</span>`;
+        }
+      }
+
+      const filtered = courses.filter(c => {
+        if (facFilter !== 'all' && String(c.faculty || '').trim() !== facFilter) return false;
+        if (lvlFilter !== 'all' && String(c.level || '').trim() !== lvlFilter) return false;
+
+        if (search) {
+          const matchCode = c.code && String(c.code).toLowerCase().includes(search);
+          const matchMajor = c.major && String(c.major).toLowerCase().includes(search);
+          const matchDegree = c.degree && String(c.degree).toLowerCase().includes(search);
+          const matchFaculty = c.faculty && String(c.faculty).toLowerCase().includes(search);
+          const matchIqa = c.iqa_standard && String(c.iqa_standard).toLowerCase().includes(search);
+          const matchIsced = c.isced_group && String(c.isced_group).toLowerCase().includes(search);
+          const matchChair = c.chairs && Array.isArray(c.chairs) && c.chairs.some(ch => ch.name && String(ch.name).toLowerCase().includes(search));
+          if (!matchCode && !matchMajor && !matchDegree && !matchFaculty && !matchIqa && !matchIsced && !matchChair) return false;
+        }
+        return true;
+      });
+
+      const countEl = document.getElementById('filter-count');
+      if (countEl) countEl.textContent = `แสดง ${filtered.length} จากทั้งหมด ${courses.length} หลักสูตร`;
+
+      const tbody = document.getElementById('courses-table-body');
+      const emptyState = document.getElementById('courses-empty-state');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        if (emptyState) emptyState.classList.remove('hidden');
+      } else {
+        if (emptyState) emptyState.classList.add('hidden');
+        filtered.forEach((c, index) => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition';
+
+          const cLevelStr = String(c.level || '');
+          let lvlBadgeClass = 'bg-blue-50 text-blue-700 border border-blue-200';
+          if (cLevelStr.includes('โท')) lvlBadgeClass = 'bg-purple-50 text-purple-700 border border-purple-200';
+          else if (cLevelStr.includes('เอก')) lvlBadgeClass = 'bg-rose-50 text-rose-700 border border-rose-200';
+          else if (cLevelStr.includes('บัณฑิต')) lvlBadgeClass = 'bg-amber-50 text-amber-700 border border-amber-200';
+
+          let chairsHtml = '';
+          if (!c.chairs || c.chairs.length === 0) {
+            chairsHtml = `<span class="text-xs text-slate-400 italic py-1 block">- ยังไม่มีรายชื่ออาจารย์ -</span>`;
+          } else {
+            chairsHtml = `<div class="space-y-1 py-1 text-xs">`;
+            c.chairs.forEach((ch, idx) => {
+              const isPresident = ch.role === 'ประธานหลักสูตร';
+              const teacherName = String(ch.name || '').trim();
+              let conflictTag = '';
+
+              if (teacherName) {
+                let vList = [];
+                let eList = [];
+                const cleanKey = cleanTeacherKey(teacherName);
+
+                if (c.chairs.filter(x => cleanTeacherKey(x.name) === cleanKey).length > 1) {
+                  vList.push('ซ้ำในหลักสูตรนี้');
+                }
+
+                courses.forEach(otherC => {
+                  if (String(otherC.code) !== String(c.code) && otherC.chairs && Array.isArray(otherC.chairs)) {
+                    if (otherC.chairs.some(och => cleanTeacherKey(och.name) === cleanKey)) {
+                      if (isAllowedMhesiException(c, otherC)) {
+                        eList.push(`${otherC.level} (${otherC.major})`);
+                      } else {
+                        vList.push(`${otherC.level} (${otherC.major})`);
+                      }
+                    }
+                  }
+                });
+
+                if (vList.length > 0) {
+                  conflictTag = `<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300 ml-1" title="⛔ ผิดเกณฑ์ อว. ห้ามซ้ำกับ: ${vList.join(', ')}">⛔ ซ้ำซ้อน</span>`;
+                } else if (eList.length > 0) {
+                  conflictTag = `<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 ml-1" title="✅ ชุดร่วม โท-เอก ตามเกณฑ์ อว.: ${eList.join(', ')}">ชุดร่วม โท-เอก</span>`;
+                }
+              }
+
+              chairsHtml += `
+                <div class="flex items-center space-x-1.5 ${isPresident ? 'font-semibold text-slate-900' : 'text-slate-700'}">
+                  <span class="text-[11px] font-mono text-slate-400 w-4 text-right">${idx+1}.</span>
+                  <span>${ch.name}</span>
+                  ${isPresident ? '<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 ml-1">ประธานหลักสูตร</span>' : ''}
+                  ${conflictTag}
+                </div>
+              `;
+            });
+            chairsHtml += `</div>`;
+          }
+
+          tr.innerHTML = `
+            <td class="py-3.5 pl-4 pr-2 text-center text-xs font-mono text-slate-400">${c.order_no || (index+1)}</td>
+            <td class="px-3 py-3.5 text-xs text-slate-700 font-medium">${c.faculty}</td>
+            <td class="px-3 py-3.5 text-center"><span class="px-2 py-0.5 rounded text-xs font-semibold ${lvlBadgeClass}">${c.level}</span></td>
+            <td class="px-3 py-3.5">
+              <div class="font-bold text-slate-900 text-xs">${c.major || '-'}</div>
+              <div class="text-[11px] text-slate-500">${c.degree || '-'} (${c.year || ''})</div>
+              <div class="text-[10px] text-slate-400 mt-0.5 font-mono">รหัส: ${c.code} ${c.iqa_standard ? '| IQA: ' + c.iqa_standard : ''}</div>
+            </td>
+            <td class="px-3 py-3.5">${chairsHtml}</td>
+            <td class="px-3 py-3.5 text-center pr-4">
+              <div class="flex items-center justify-center space-x-1">
+                <button onclick="handleManageChairsClick('${c.code}')" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition" title="จัดการอาจารย์ผู้รับผิดชอบหลักสูตร">
+                  จัดการ
+                </button>
+                <button onclick="handleEditCourseClick('${c.code}')" class="p-1 rounded-lg hover:bg-slate-100 text-slate-600 hover:text-indigo-600 transition" title="แก้ไขข้อมูลหลักสูตร">
+                  ✏️
+                </button>
+                <button onclick="handleDeleteCourseClick('${c.code}')" class="p-1 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition" title="ลบหลักสูตรนี้">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    function renderReportTable() {
+      const tbody = document.getElementById('report-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      courses.forEach(c => {
+        const chairs = (c.chairs && Array.isArray(c.chairs)) ? c.chairs : [];
+        if (chairs.length === 0) {
+          const tr = document.createElement('tr');
+          tr.className = 'border-t-2 border-slate-300 hover:bg-slate-50';
+          tr.innerHTML = `
+            <td class="border border-slate-200 px-3 py-2 font-mono font-semibold text-slate-700">${c.code}</td>
+            <td class="border border-slate-200 px-3 py-2 text-slate-800">${c.faculty}</td>
+            <td class="border border-slate-200 px-3 py-2 text-slate-700">${c.level}</td>
+            <td class="border border-slate-200 px-3 py-2 text-slate-800">${c.degree || '-'}</td>
+            <td class="border border-slate-200 px-3 py-2 font-semibold text-slate-900">${c.major}</td>
+            <td class="border border-slate-200 px-3 py-2 text-slate-600">${c.year}</td>
+            <td class="border border-slate-200 px-3 py-2 text-slate-600">${c.iqa_standard || '-'}</td>
+            <td class="border border-slate-200 px-3 py-2 text-slate-600">${c.course_standard || '-'}</td>
+            <td class="border border-slate-200 px-3 py-2 text-slate-600">${c.isced_group || '-'}</td>
+            <td class="border border-slate-200 px-3 py-2 text-slate-400 italic">(ยังไม่ระบุอาจารย์ผู้รับผิดชอบหลักสูตร)</td>
+          `;
+          tbody.appendChild(tr);
+        } else {
+          chairs.forEach((ch, idx) => {
+            const tr = document.createElement('tr');
+            if (idx === 0) {
+              tr.className = 'border-t-2 border-slate-300 hover:bg-slate-50';
+              tr.innerHTML = `
+                <td class="border border-slate-200 px-3 py-1.5 font-mono font-semibold text-slate-700">${c.code}</td>
+                <td class="border border-slate-200 px-3 py-1.5 text-slate-800">${c.faculty}</td>
+                <td class="border border-slate-200 px-3 py-1.5 text-slate-700">${c.level}</td>
+                <td class="border border-slate-200 px-3 py-1.5 text-slate-800">${c.degree || '-'}</td>
+                <td class="border border-slate-200 px-3 py-1.5 font-semibold text-slate-900">${c.major}</td>
+                <td class="border border-slate-200 px-3 py-1.5 text-slate-600">${c.year}</td>
+                <td class="border border-slate-200 px-3 py-1.5 text-slate-600">${c.iqa_standard || '-'}</td>
+                <td class="border border-slate-200 px-3 py-1.5 text-slate-600">${c.course_standard || '-'}</td>
+                <td class="border border-slate-200 px-3 py-1.5 text-slate-600">${c.isced_group || '-'}</td>
+                <td class="border border-slate-200 px-3 py-1.5 font-medium text-slate-900">
+                  <span class="text-slate-400 font-mono mr-1">${idx+1}.</span>
+                  <span>${ch.name}</span>
+                  ${ch.role === 'ประธานหลักสูตร' ? '<span class="ml-1 text-[10px] text-indigo-600 font-bold">(ประธาน)</span>' : ''}
+                </td>
+              `;
+            } else {
+              tr.className = 'hover:bg-slate-50 bg-slate-50/20';
+              tr.innerHTML = `
+                <td class="border border-slate-200 px-3 py-1.5"></td>
+                <td class="border border-slate-200 px-3 py-1.5"></td>
+                <td class="border border-slate-200 px-3 py-1.5"></td>
+                <td class="border border-slate-200 px-3 py-1.5"></td>
+                <td class="border border-slate-200 px-3 py-1.5"></td>
+                <td class="border border-slate-200 px-3 py-1.5"></td>
+                <td class="border border-slate-200 px-3 py-1.5"></td>
+                <td class="border border-slate-200 px-3 py-1.5"></td>
+                <td class="border border-slate-200 px-3 py-1.5"></td>
+                <td class="border border-slate-200 px-3 py-1.5 font-medium text-slate-900">
+                  <span class="text-slate-400 font-mono mr-1">${idx+1}.</span>
+                  <span>${ch.name}</span>
+                </td>
+              `;
+            }
+            tbody.appendChild(tr);
+          });
+        }
+      });
+    }
+
+    function populateFacultyDropdown() {
+      const select = document.getElementById('faculty-filter');
+      if (!select) return;
+      const currentVal = select.value || 'all';
+      select.innerHTML = '<option value="all">ทุกคณะ / วิทยาลัย (ทั้งหมด)</option>';
+      const faculties = [...new Set(courses.map(c => String(c.faculty || '').trim()))].filter(Boolean).sort();
+      faculties.forEach(fac => {
+        const opt = document.createElement('option');
+        opt.value = fac;
+        opt.textContent = fac;
+        if (fac === currentVal) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    // ==================== COURSE CRUD (เพิ่ม, ลด, เปลี่ยน) ====================
+    function handleAddNewCourseClick() {
+      if (!isAuthenticated()) {
+        openPasswordModal(() => openCourseFormModal(null));
+        return;
+      }
+      openCourseFormModal(null);
+    }
+
+    function handleEditCourseClick(code) {
+      if (!isAuthenticated()) {
+        openPasswordModal(() => openCourseFormModal(code));
+        return;
+      }
+      openCourseFormModal(code);
+    }
+
+    async function handleDeleteCourseClick(code) {
+      if (!isAuthenticated()) {
+        openPasswordModal(() => handleDeleteCourseClick(code));
+        return;
+      }
+
+      const c = courses.find(item => String(item.code) === String(code));
+      if (!c) return;
+
+      const confirmMsg = `⚠️ คุณแน่ใจหรือไม่ว่าต้องการ "ลบ" หลักสูตรนี้?\n\n- รหัส: ${c.code}\n- สาขาวิชา: ${c.major} (${c.level})\n- คณะ: ${c.faculty}\n\n*คำเตือน: รายชื่ออาจารย์ผู้รับผิดชอบหลักสูตรนี้จะถูกลบออกไปด้วยทันที`;
+      if (!confirm(confirmMsg)) return;
+
+      showToast('กำลังลบหลักสูตรจาก Supabase...', 'info');
+      try {
+        const { error } = await supabaseClient
+          .from('courses')
+          .delete()
+          .eq('code', String(code).trim());
+
+        if (error) throw error;
+        showToast('✅ ลบหลักสูตรสำเร็จแล้ว', 'success');
+        fetchCoursesAndChairs();
+      } catch (err) {
+        console.error('Delete error:', err);
+        showToast('⚠️ ไม่สามารถลบหลักสูตรได้: ' + err.message, 'error');
+      }
+    }
+
+    function openCourseFormModal(code = null) {
+      const modal = document.getElementById('course-form-modal');
+      const title = document.getElementById('course-form-title');
+      const idInput = document.getElementById('form-course-id');
+      const codeInput = document.getElementById('form-course-code');
+      const levelSelect = document.getElementById('form-course-level');
+      const facultyInput = document.getElementById('form-course-faculty');
+      const degreeInput = document.getElementById('form-course-degree');
+      const majorInput = document.getElementById('form-course-major');
+      const yearInput = document.getElementById('form-course-year');
+      const iqaInput = document.getElementById('form-course-iqa');
+      const standardInput = document.getElementById('form-course-standard');
+      const iscedInput = document.getElementById('form-course-isced');
+
+      if (code) {
+        const c = courses.find(item => String(item.code) === String(code));
+        if (!c) return;
+        title.textContent = 'แก้ไขข้อมูลหลักสูตร (เปลี่ยนข้อมูล)';
+        idInput.value = c.id || '';
+        codeInput.value = c.code || '';
+        levelSelect.value = c.level || 'ปริญญาตรี';
+        facultyInput.value = c.faculty || '';
+        degreeInput.value = c.degree || '';
+        majorInput.value = c.major || '';
+        yearInput.value = c.year || '';
+        iqaInput.value = c.iqa_standard || '';
+        standardInput.value = c.course_standard || '';
+        iscedInput.value = c.isced_group || '';
+      } else {
+        title.textContent = 'เพิ่มหลักสูตรใหม่';
+        idInput.value = '';
+        codeInput.value = '';
+        levelSelect.value = 'ปริญญาตรี';
+        facultyInput.value = '';
+        degreeInput.value = '';
+        majorInput.value = '';
+        yearInput.value = 'หลักสูตรปรับปรุง พ.ศ. 2568';
+        iqaInput.value = 'สป.อว.';
+        standardInput.value = 'พ.ศ. 2565';
+        iscedInput.value = '';
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeCourseFormModal() {
+      document.getElementById('course-form-modal').classList.add('hidden');
+    }
+
+    async function saveCourseForm(e) {
+      e.preventDefault();
+      if (!supabaseClient) {
+        showToast('กรุณาตั้งค่า Supabase ก่อน', 'error');
+        return;
+      }
+
+      const id = document.getElementById('form-course-id').value;
+      const code = document.getElementById('form-course-code').value.trim();
+      const level = document.getElementById('form-course-level').value.trim();
+      const faculty = document.getElementById('form-course-faculty').value.trim();
+      const degree = document.getElementById('form-course-degree').value.trim();
+      const major = document.getElementById('form-course-major').value.trim();
+      const year = document.getElementById('form-course-year').value.trim();
+      const iqa = document.getElementById('form-course-iqa').value.trim();
+      const standard = document.getElementById('form-course-standard').value.trim();
+      const isced = document.getElementById('form-course-isced').value.trim();
+      const minReq = (level.includes('โท') || level.includes('เอก')) ? 3 : 5;
+
+      const payload = {
+        code: code,
+        faculty: faculty,
+        level: level,
+        degree: degree,
+        major: major,
+        year: year,
+        min_req: minReq,
+        iqa_standard: iqa,
+        course_standard: standard,
+        isced_group: isced,
+        updated_at: new Date().toISOString()
+      };
+
+      showToast('กำลังบันทึกข้อมูลหลักสูตร...', 'info');
+      try {
+        if (id) {
+          const { error } = await supabaseClient
+            .from('courses')
+            .update(payload)
+            .eq('id', Number(id));
+          if (error) throw error;
+          showToast('✅ แก้ไขข้อมูลหลักสูตรสำเร็จแล้ว!', 'success');
+        } else {
+          const maxOrder = courses.reduce((max, c) => Math.max(max, c.order_no || 0), 0);
+          payload.order_no = maxOrder + 1;
+          const { error } = await supabaseClient
+            .from('courses')
+            .insert([payload]);
+          if (error) throw error;
+          showToast('✅ เพิ่มหลักสูตรใหม่สำเร็จแล้ว!', 'success');
+        }
+
+        closeCourseFormModal();
+        fetchCoursesAndChairs();
+      } catch (err) {
+        console.error('Save course error:', err);
+        showToast('⚠️ บันทึกไม่สำเร็จ: ' + err.message, 'error');
+      }
+    }
+
+    // ==================== CHAIRS MODAL & SAVE ====================
+    function handleManageChairsClick(code) {
+      if (!isAuthenticated()) {
+        openPasswordModal(() => openEditModal(code));
+        return;
+      }
+      openEditModal(code);
+    }
+
+    function openEditModal(courseCode) {
+      const c = courses.find(item => String(item.code) === String(courseCode));
+      if (!c) {
+        alert('ไม่พบข้อมูลหลักสูตร: ' + courseCode);
+        return;
+      }
+      currentEditingCode = courseCode;
+      activeInputIndex = 0;
+      lastFocusedChairInput = null;
+
+      document.getElementById('modal-course-code').textContent = c.code;
+      document.getElementById('modal-faculty').textContent = c.faculty;
+      document.getElementById('modal-badge-level').textContent = c.level;
+      document.getElementById('modal-major').textContent = c.major;
+      document.getElementById('modal-degree').textContent = `${c.degree || ''} (${c.year || ''})`;
+
+      const minReq = Number(c.minReq) || 5;
+      document.getElementById('modal-criteria-text').textContent = 
+        `หลักสูตรระดับ ${c.level} ต้องมีอาจารย์ผู้รับผิดชอบหลักสูตรอย่างน้อย ${minReq} คน`;
+
+      const container = document.getElementById('chair-inputs-container');
+      container.innerHTML = '';
+
+      const chairList = (c.chairs && Array.isArray(c.chairs) && c.chairs.length > 0) ? [...c.chairs] : [];
+      if (chairList.length === 0) {
+        for (let i = 0; i < minReq; i++) {
+          chairList.push({ name: '', academicTitle: '', degree: '', role: (i === 0 ? 'ประธานหลักสูตร' : 'อาจารย์ผู้รับผิดชอบหลักสูตร') });
+        }
+      }
+
+      chairList.forEach((ch, idx) => {
+        addChairInput(ch.name || '', ch.academicTitle || '', ch.degree || '', ch.role || (idx === 0 ? 'ประธานหลักสูตร' : 'อาจารย์ผู้รับผิดชอบหลักสูตร'));
+      });
+
+      const allInputs = container.querySelectorAll('.chair-name-input');
+      allInputs.forEach(inp => {
+        if (inp.value.trim()) checkTeacherConflict(inp);
+      });
+
+      updateModalCriteriaBadge();
+      setEditMode('list');
+      document.getElementById('edit-modal').classList.remove('hidden');
+
+      setTimeout(() => {
+        const firstInput = container.querySelector('.chair-name-input');
+        if (firstInput) {
+          firstInput.focus();
+          lastFocusedChairInput = firstInput;
+        }
+      }, 50);
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+      currentEditingCode = null;
+    }
+
+    function addChairInput(name = '', academicTitle = '', degree = '', role = 'อาจารย์ผู้รับผิดชอบหลักสูตร') {
+      const container = document.getElementById('chair-inputs-container');
+      const idx = container.children.length + 1;
+      const row = document.createElement('div');
+      row.className = 'p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2 chair-row';
+      
+      row.innerHTML = `
+        <div class="flex items-center space-x-2">
+          <span class="text-xs font-mono font-bold text-slate-400 w-5 text-center">${idx}.</span>
+          <div class="flex-1">
+            <input type="text" value="${name.replace(/"/g, '&quot;')}" 
+              onclick="lastFocusedChairInput = this; activeInputIndex = Array.from(document.querySelectorAll('#chair-inputs-container .chair-name-input')).indexOf(this);"
+              onfocus="lastFocusedChairInput = this; activeInputIndex = Array.from(document.querySelectorAll('#chair-inputs-container .chair-name-input')).indexOf(this);"
+              oninput="checkTeacherConflict(this); updateModalCriteriaBadge();" 
+              placeholder="ชื่อ-สกุลพร้อมตำแหน่ง เช่น ผศ.ดร.สมชาย ใจดี" 
+              class="chair-name-input w-full px-3 py-1.5 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-slate-800">
+          </div>
+          <select class="chair-role-select text-xs py-1.5 px-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none font-medium">
+            <option value="ประธานหลักสูตร" ${role === 'ประธานหลักสูตร' ? 'selected' : ''}>ประธานหลักสูตร</option>
+            <option value="อาจารย์ผู้รับผิดชอบหลักสูตร" ${role !== 'ประธานหลักสูตร' ? 'selected' : ''}>อาจารย์ผู้รับผิดชอบหลักสูตร</option>
+          </select>
+          <button onclick="removeChairInput(this)" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition" title="ลบรายชื่อนี้">
+            &times;
+          </button>
+        </div>
+        <div class="chair-conflict-alert hidden text-[11px] pl-7 font-medium"></div>
+      `;
+      container.appendChild(row);
+      updateModalCriteriaBadge();
+    }
+
+    function removeChairInput(btn) {
+      const container = document.getElementById('chair-inputs-container');
+      if (container.children.length <= 1) {
+        const input = container.querySelector('.chair-name-input');
+        if (input) input.value = '';
+        updateModalCriteriaBadge();
+        return;
+      }
+      btn.closest('.chair-row').remove();
+      Array.from(container.children).forEach((row, i) => {
+        row.querySelector('span').textContent = (i + 1) + '.';
+      });
+      updateModalCriteriaBadge();
+    }
+
+    function checkTeacherConflict(input) {
+      const val = input.value.trim();
+      const alertDiv = input.closest('.chair-row').querySelector('.chair-conflict-alert');
+      if (!val) {
+        alertDiv.className = 'chair-conflict-alert hidden text-[11px] pl-7 font-medium';
+        alertDiv.innerHTML = '';
+        return;
+      }
+
+      const currentCourse = courses.find(item => String(item.code) === String(currentEditingCode));
+      const cleanVal = cleanTeacherKey(val);
+
+      const allModalInputs = Array.from(document.querySelectorAll('#chair-inputs-container .chair-name-input'));
+      const sameModalCount = allModalInputs.filter(inp => inp !== input && cleanTeacherKey(inp.value) === cleanVal).length;
+      if (sameModalCount > 0) {
+        alertDiv.className = 'chair-conflict-alert text-[11px] pl-7 font-medium text-rose-700 bg-rose-50 p-1.5 rounded-lg border border-rose-200 mt-1';
+        alertDiv.innerHTML = `⛔ ผิดเกณฑ์มาตรฐาน: ระบุชื่ออาจารย์ท่านนี้ซ้ำกันในหลักสูตรนี้`;
+        alertDiv.classList.remove('hidden');
+        return;
+      }
+
+      const conflictList = [];
+      const allowedList = [];
+
+      courses.forEach(otherC => {
+        if (String(otherC.code) !== String(currentEditingCode) && otherC.chairs && Array.isArray(otherC.chairs)) {
+          if (otherC.chairs.some(och => cleanTeacherKey(och.name) === cleanVal)) {
+            if (isAllowedMhesiException(currentCourse, otherC)) {
+              allowedList.push(`${otherC.level} (${otherC.major})`);
+            } else {
+              conflictList.push(`${otherC.level} (${otherC.major})`);
+            }
+          }
+        }
+      });
+
+      if (conflictList.length > 0) {
+        alertDiv.className = 'chair-conflict-alert text-[11px] pl-7 font-medium text-rose-700 bg-rose-50 p-1.5 rounded-lg border border-rose-200 mt-1';
+        alertDiv.innerHTML = `⛔ ผิดเกณฑ์ อว. (ห้ามซ้ำซ้อน): อาจารย์ท่านนี้เป็นผู้รับผิดชอบอยู่ในหลักสูตร <i>${conflictList.join(', ')}</i> แล้ว`;
+        alertDiv.classList.remove('hidden');
+      } else if (allowedList.length > 0) {
+        alertDiv.className = 'chair-conflict-alert text-[11px] pl-7 font-medium text-emerald-800 bg-emerald-50 p-1.5 rounded-lg border border-emerald-200 mt-1';
+        alertDiv.innerHTML = `✅ ได้รับการยกเว้นตามเกณฑ์ อว.: เป็นผู้รับผิดชอบร่วมกับ ${allowedList.join(', ')} (ป.โท-ป.เอก สาขาวิชาเดียวกัน อนุญาตให้ใช้อาจารย์ชุดเดียวกันได้)`;
+        alertDiv.classList.remove('hidden');
+      } else {
+        alertDiv.className = 'chair-conflict-alert hidden text-[11px] pl-7 font-medium';
+        alertDiv.innerHTML = '';
+      }
+    }
+
+    function updateModalCriteriaBadge() {
+      const c = courses.find(item => String(item.code) === String(currentEditingCode));
+      if (!c) return;
+
+      const minReq = Number(c.minReq) || 5;
+      const inputs = document.querySelectorAll('#chair-inputs-container .chair-name-input');
+      const filledCount = Array.from(inputs).map(inp => inp.value.trim()).filter(Boolean).length;
+      
+      const badge = document.getElementById('modal-chair-count-badge');
+      const box = document.getElementById('modal-criteria-box');
+
+      badge.textContent = `${filledCount} / ${minReq} คน`;
+
+      if (filledCount >= minReq) {
+        box.className = 'mx-6 mt-4 p-3.5 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 text-xs flex items-center justify-between';
+        badge.className = 'px-2.5 py-1 rounded-full font-bold text-xs bg-emerald-200 text-emerald-900';
+      } else {
+        box.className = 'mx-6 mt-4 p-3.5 rounded-xl border bg-amber-50 border-amber-200 text-amber-800 text-xs flex items-center justify-between';
+        badge.className = 'px-2.5 py-1 rounded-full font-bold text-xs bg-amber-200 text-amber-900';
+      }
+    }
+
+    function addTitleToActive(prefix) {
+      const inputs = Array.from(document.querySelectorAll('#chair-inputs-container .chair-name-input'));
+      if (inputs.length === 0) return;
+
+      let targetInput = null;
+      if (lastFocusedChairInput && inputs.includes(lastFocusedChairInput)) {
+        targetInput = lastFocusedChairInput;
+      } else if (inputs[activeInputIndex]) {
+        targetInput = inputs[activeInputIndex];
+      } else {
+        targetInput = inputs.find(inp => !inp.value.trim()) || inputs[0];
+      }
+
+      if (targetInput) {
+        const cleanName = targetInput.value.replace(/^(ศาสตราจารย์\s*ดร\.|รองศาสตราจารย์\s*ดร\.|ผู้ช่วยศาสตราจารย์\s*ดร\.|อาจารย์\s*ดร\.|ศ\.ดร\.|รศ\.ดร\.|ผศ\.ดร\.|อ\.ดร\.|ศ\.|รศ\.|ผศ\.|อ\.|อาจารย์|ดร\.)\s*/g, '');
+        targetInput.value = prefix + (cleanName ? cleanName : '');
+        lastFocusedChairInput = targetInput;
+        targetInput.focus();
+        checkTeacherConflict(targetInput);
+        updateModalCriteriaBadge();
+      }
+    }
+
+    function setEditMode(mode) {
+      const listTab = document.getElementById('tab-list-btn');
+      const bulkTab = document.getElementById('tab-bulk-btn');
+      const modeList = document.getElementById('mode-list');
+      const modeBulk = document.getElementById('mode-bulk');
+
+      if (mode === 'list') {
+        listTab.className = 'pb-2 px-1 border-b-2 border-indigo-600 text-indigo-600 font-bold';
+        bulkTab.className = 'pb-2 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-700';
+        modeList.classList.remove('hidden');
+        modeBulk.classList.add('hidden');
+      } else {
+        bulkTab.className = 'pb-2 px-1 border-b-2 border-indigo-600 text-indigo-600 font-bold';
+        listTab.className = 'pb-2 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-700';
+        modeBulk.classList.remove('hidden');
+        modeList.classList.add('hidden');
+
+        const inputs = document.querySelectorAll('#chair-inputs-container .chair-name-input');
+        const names = Array.from(inputs).map(inp => inp.value.trim()).filter(Boolean);
+        document.getElementById('bulk-textarea').value = names.join('\n');
+      }
+    }
+
+    function applyBulkPaste() {
+      const text = document.getElementById('bulk-textarea').value;
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const container = document.getElementById('chair-inputs-container');
+      container.innerHTML = '';
+      if (lines.length === 0) {
+        addChairInput('');
+      } else {
+        lines.forEach((line, i) => {
+          addChairInput(line, '', '', i === 0 ? 'ประธานหลักสูตร' : 'อาจารย์ผู้รับผิดชอบหลักสูตร');
+        });
+      }
+      setEditMode('list');
+      updateModalCriteriaBadge();
+    }
+
+    async function saveModalData() {
+      const c = courses.find(item => String(item.code) === String(currentEditingCode));
+      if (!c) return;
+
+      if (!isAuthenticated()) {
+        openPasswordModal(() => saveModalData());
+        return;
+      }
+
+      const rows = document.querySelectorAll('#chair-inputs-container .chair-row');
+      const cleanChairs = [];
+      const violations = [];
+      const nameSetInThisModal = new Set();
+
+      rows.forEach((r, idx) => {
+        const nameInput = r.querySelector('.chair-name-input');
+        const roleSelect = r.querySelector('.chair-role-select');
+        const nameVal = nameInput ? nameInput.value.trim() : '';
+        if (nameVal) {
+          const cleanKey = cleanTeacherKey(nameVal);
+
+          if (nameSetInThisModal.has(cleanKey)) {
+            violations.push(`• "${nameVal}" ถูกระบุซ้ำในหลักสูตรนี้มากกว่า 1 แถว`);
+          }
+          nameSetInThisModal.add(cleanKey);
+
+          courses.forEach(otherC => {
+            if (String(otherC.code) !== String(c.code) && otherC.chairs && Array.isArray(otherC.chairs)) {
+              if (otherC.chairs.some(och => cleanTeacherKey(och.name) === cleanKey)) {
+                if (!isAllowedMhesiException(c, otherC)) {
+                  violations.push(`• "${nameVal}" ซ้ำกับหลักสูตร ${otherC.level} (${otherC.major})`);
+                }
+              }
+            }
+          });
+
+          cleanChairs.push({
+            name: nameVal,
+            academicTitle: '',
+            degree: nameVal.includes('ดร.') ? 'ปริญญาเอก' : 'ปริญญาโท',
+            role: roleSelect ? roleSelect.value : (idx === 0 ? 'ประธานหลักสูตร' : 'อาจารย์ผู้รับผิดชอบหลักสูตร')
+          });
+        }
+      });
+
+      if (violations.length > 0) {
+        const confirmMsg = '⚠️ ตรวจพบรายชื่ออาจารย์ซ้ำซ้อนที่อาจผิดเกณฑ์มาตรฐาน อว.:\n\n' +
+                           violations.join('\n') +
+                           '\n\n*เกณฑ์ อว.: ห้ามซ้ำซ้อนในระดับ ป.ตรี / ป.บัณฑิต / ป.โท / ป.เอก\n(ยกเว้นเฉพาะ ป.โท-ป.เอก ในสาขาวิชาเดียวกันเท่านั้นที่อนุญาตให้ใช้ชุดเดียวกันได้)\n\nคุณยังคงต้องการยืนยันบันทึกข้อมูลนี้หรือไม่?';
+        if (!confirm(confirmMsg)) return;
+      }
+
+      showToast('กำลังบันทึกลง Supabase...', 'info');
+      try {
+        const { error: delErr } = await supabaseClient
+          .from('course_chairs')
+          .delete()
+          .eq('course_code', String(c.code).trim());
+
+        if (delErr) throw delErr;
+
+        if (cleanChairs.length > 0) {
+          const rowsToInsert = cleanChairs.map((ch, idx) => ({
+            course_code: String(c.code).trim(),
+            order_no: idx + 1,
+            name: ch.name,
+            academic_title: ch.academicTitle,
+            degree_level: ch.degree,
+            role: ch.role
+          }));
+
+          const { error: insErr } = await supabaseClient
+            .from('course_chairs')
+            .insert(rowsToInsert);
+
+          if (insErr) throw insErr;
+        }
+
+        c.chairs = cleanChairs;
+        closeEditModal();
+        renderCoursesTable();
+        renderReportTable();
+        showToast('✅ บันทึกลง Supabase สำเร็จแล้ว!', 'success');
+      } catch (err) {
+        console.error('Save chairs error:', err);
+        showToast('⚠️ บันทึกไม่สำเร็จ: ' + err.message, 'error');
+      }
+    }
+
+    // Tab Navigation
+    function switchMainTab(tab) {
+      const viewCourses = document.getElementById('view-courses');
+      const viewReport = document.getElementById('view-report');
+      const btnCourses = document.getElementById('nav-courses-btn');
+      const btnReport = document.getElementById('nav-report-btn');
+
+      if (viewCourses) viewCourses.classList.add('hidden');
+      if (viewReport) viewReport.classList.add('hidden');
+
+      if (btnCourses) btnCourses.className = 'py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-1.5';
+      if (btnReport) btnReport.className = 'py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-1.5';
+
+      if (tab === 'courses') {
+        if (viewCourses) viewCourses.classList.remove('hidden');
+        if (btnCourses) btnCourses.className = 'py-2.5 border-b-2 border-indigo-600 text-indigo-600 font-bold flex items-center space-x-1.5';
+        renderCoursesTable();
+      } else {
+        if (viewReport) viewReport.classList.remove('hidden');
+        if (btnReport) btnReport.className = 'py-2.5 border-b-2 border-indigo-600 text-indigo-600 font-bold flex items-center space-x-1.5';
+        renderReportTable();
+      }
+    }
+
+    // App Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAuthStatus();
+      initSupabase();
+      fetchCoursesAndChairs();
+    });
+  </script>
+</body>
+</html>
